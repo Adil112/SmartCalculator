@@ -1,0 +1,15 @@
+﻿@model List<SmartCalculator.Models.History>
+@*
+
+*@
+
+<form action="/Home/GetData" method="post">
+
+    <div class="per">Период</div>
+    <input name="d1" type="datetime-local" style="position: absolute; width: 20%; height: 3.8%; left: 32.3%; top: 11.13%; border: 1px solid #000000; box-sizing: border-box;">
+    <p><strong>&#8212&#8212</strong></p>
+    <input name="d2" type="datetime-local" style="position: absolute; width: 20%; height: 3.8%; left: 59.1%; top: 11.13%; border: 1px solid #000000; box-sizing: border-box;">
+    <button type="submit" class="pos"><div class="posm">Посмотреть</div></button>
+</form>
+    
+
