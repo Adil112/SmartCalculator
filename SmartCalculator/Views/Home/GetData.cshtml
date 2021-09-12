@@ -3,43 +3,78 @@
 
 *@
 
-<form action="/Home/GetData" method="post">
+<form action="/Home/GetData" method="post" style="display: flex; align-items: center; justify-content: space-between; ">
 
     <div class="per">Период</div>
-    <input name="d1" type="datetime-local" style="position: absolute; width: 20%; height: 3.8%; left: 32.3%; top: 11.13%; border: 1px solid #000000; box-sizing: border-box;">
+    <input name="d1" type="datetime-local" style="width: 20%; height: 3.8%; left: 32.3%; top: 11.13%; border: 1px solid #000000; box-sizing: border-box;">
     <p><strong>&#8212&#8212</strong></p>
-    <input name="d2" type="datetime-local" style="position: absolute; width: 20%; height: 3.8%; left: 59.1%; top: 11.13%; border: 1px solid #000000; box-sizing: border-box;">
+    <input name="d2" type="datetime-local" style="width: 20%; height: 3.8%; left: 59.1%; top: 11.13%; border: 1px solid #000000; box-sizing: border-box;">
     <button type="submit" class="pos"><div class="posm">Посмотреть</div></button>
 </form>
 
-<div id="curve_chart" class="rab">
-    <table class="table">
-        <tr>
-            <th>
-                Дата и время
-            </th>
-            <th>
-                Операция
-            </th>
-            <th>
-                IP-адрес
-            </th>
-        </tr>
-        @if(ViewBag.datas != null)
-        @foreach (History t in ViewBag.datas)
-        {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelUser => t.dateTime)
-        </td>
-        <td>
-            @Html.DisplayFor(modelUser => t.operation)
-        </td>
-        <td>
-            @Html.DisplayFor(modelUser => t.ip)
-        </td>
-    </tr>
-        }
-    </table>
+<div style="        display: flex;
+        align-items: center;
+        justify-content: space-around;">
+    <div>
+        <table class="table">
+            <tr>
+                <th>
+                    Дата и время
+                </th>
+                <th>
+                    Операция
+                </th>
+                <th>
+                    IP-адрес
+                </th>
+            </tr>
+            @if (ViewBag.datas != null)
+                @foreach (History t in ViewBag.datas)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelUser => t.dateTime)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelUser => t.operation)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelUser => t.ip)
+                        </td>
+                    </tr>
+                }
+        </table>
+    </div>  
+    <div>
+        <table class="table">
+            <tr>
+                <th>
+                    Дата и время
+                </th>
+                <th>
+                    Операция
+                </th>
+                <th>
+                    IP-адрес
+                </th>
+            </tr>
+            @if (ViewBag.datas != null)
+                @foreach (History t in ViewBag.datas)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelUser => t.dateTime)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelUser => t.operation)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelUser => t.ip)
+                        </td>
+                    </tr>
+                }
+        </table>
+    </div>
+    
 </div>
 

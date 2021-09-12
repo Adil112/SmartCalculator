@@ -76,8 +76,10 @@ namespace SmartCalculator.Controllers
             else dCount1 = d1;
             if (d2.Minute != 0 || d2.Second != 0) dCount2 = d2.AddMinutes(-d1.Minute).AddSeconds(-d1.Second);
             else dCount2 = d2;
-
-            
+            int dayC = (dCount2 - dCount1).Days;
+            int hourC = dCount2.Hour - dCount1.Hour;
+            int maxCounter = dayC * 24 + hourC;
+            DataCount[] dataCounts = new DataCount[++maxCounter];
             List<History> data1 = new List<History>();
             List<History> data = new List<History>();
             string path = @"D:\Adil\ElesyTest\Data.xlsx";
@@ -98,33 +100,34 @@ namespace SmartCalculator.Controllers
                     hh.ip = worksheet.Cells[i, 3].Value.ToString();
                     data.Add(hh);
                 }
-                int maxCounter = dCount2.Hour - dCount2.Hour;
-                int counter = 0;
-                DataCount[] dataCounts = new DataCount[maxCounter++];
-                for(int i =0; i <= maxCounter; i++)
+                
+                for(int i =0; i < maxCounter; i++)
                 {
-                    dataCounts[i].DateTime = dCount1.ToString();
-                    dataCounts[i].Count = 0;
+                    DataCount dt = new DataCount();
+                    dt.DateTime = dCount1.AddHours(i).ToString();
+                    dt.Count = 0;
+                    dataCounts[i] = dt;
                 }
                 foreach(var t in data)
                 {
                     DateTime time = DateTime.ParseExact(t.dateTime, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture); 
                     if (time > d1 && time < d2)
-                    { data1.Add(t);
-                        if ((dCount1.Hour + counter) < time.Hour && time.Hour < (dCount1.Hour+1) && counter <= maxCounter)
+                    { 
+                        data1.Add(t);
+                        for(int i =0; i < maxCounter; i++)
                         {
-                            DataCount dt = new DataCount();
-                            if () { }
-                            else {
-                                dt.DateTime = dCount1.ToString();
-                                dt.Count = 1;
+                            int j = i + 1;
+                            bool oio = (dCount1.Hour + i) == time.Hour && time.Hour < (dCount1.Hour + j);
+                            if ((dCount1.Hour + i) == time.Hour && time.Hour < (dCount1.Hour + j))
+                            {
+                                dataCounts[i].Count++;
                             }
-                                
-                            counter++;
                         }
+                        
                     }
                 }
             }
+            ViewBag.dataCounts = dataCounts;
             ViewBag.datas = data1;
             return View(); 
         }
