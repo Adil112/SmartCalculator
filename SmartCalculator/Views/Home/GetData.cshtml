@@ -13,7 +13,7 @@
 </form>
 
 <div style="        display: flex;
-        align-items: center;
+        align-items: start;
         justify-content: space-around;">
     <div>
         <table class="table">
@@ -52,24 +52,18 @@
                     Дата и время
                 </th>
                 <th>
-                    Операция
-                </th>
-                <th>
-                    IP-адрес
+                    Кол-во операций
                 </th>
             </tr>
-            @if (ViewBag.datas != null)
-                @foreach (History t in ViewBag.datas)
+            @if (ViewBag.dataCounts != null)
+                @foreach (DataCount t in ViewBag.dataCounts)
                 {
                     <tr>
                         <td>
-                            @Html.DisplayFor(modelUser => t.dateTime)
+                            @Html.DisplayFor(modelUser => t.DateTime)
                         </td>
                         <td>
-                            @Html.DisplayFor(modelUser => t.operation)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelUser => t.ip)
+                            @Html.DisplayFor(modelUser => t.Count)
                         </td>
                     </tr>
                 }

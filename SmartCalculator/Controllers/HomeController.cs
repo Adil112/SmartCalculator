@@ -76,9 +76,8 @@ namespace SmartCalculator.Controllers
             else dCount1 = d1;
             if (d2.Minute != 0 || d2.Second != 0) dCount2 = d2.AddMinutes(-d1.Minute).AddSeconds(-d1.Second);
             else dCount2 = d2;
-            int dayC = (dCount2 - dCount1).Days;
-            int hourC = dCount2.Hour - dCount1.Hour;
-            int maxCounter = dayC * 24 + hourC;
+            var max = (dCount2 - dCount1).TotalHours;
+            int maxCounter = (int)max;
             DataCount[] dataCounts = new DataCount[++maxCounter];
             List<History> data1 = new List<History>();
             List<History> data = new List<History>();
@@ -117,17 +116,25 @@ namespace SmartCalculator.Controllers
                         for(int i =0; i < maxCounter; i++)
                         {
                             int j = i + 1;
-                            bool oio = (dCount1.Hour + i) == time.Hour && time.Hour < (dCount1.Hour + j);
-                            if ((dCount1.Hour + i) == time.Hour && time.Hour < (dCount1.Hour + j))
+                            //(dCount1.Hour + i) == time.Hour && time.Hour < (dCount1.Hour + j
+                            DateTime dCount3 = dCount1.AddHours(i);
+                            DateTime dCount4 = dCount1.AddHours(j);
+                            if ((dCount3 < time) && (time < dCount4))
                             {
                                 dataCounts[i].Count++;
                             }
+                                
                         }
                         
                     }
                 }
             }
-            ViewBag.dataCounts = dataCounts;
+            List<DataCount> dataCounts1 = new List<DataCount>();
+            for(int i =0; i < dataCounts.Length; i++)
+            {
+                if (dataCounts[i].Count != 0) dataCounts1.Add(dataCounts[i]);
+            }
+            ViewBag.dataCounts = dataCounts1;
             ViewBag.datas = data1;
             return View(); 
         }
