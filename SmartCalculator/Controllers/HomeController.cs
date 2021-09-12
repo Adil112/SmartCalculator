@@ -70,6 +70,14 @@ namespace SmartCalculator.Controllers
         [HttpPost]
         public IActionResult GetData(DateTime d1, DateTime d2)
         {
+            DateTime dCount1 = new DateTime(2021, 1, 1, 0, 0, 0); 
+            DateTime dCount2 = new DateTime(2021, 1, 1, 0, 0, 0);
+            if (d1.Minute != 0 || d1.Second != 0) dCount1 = d1.AddMinutes(-d1.Minute).AddSeconds(-d1.Second);
+            else dCount1 = d1;
+            if (d2.Minute != 0 || d2.Second != 0) dCount2 = d2.AddMinutes(-d1.Minute).AddSeconds(-d1.Second);
+            else dCount2 = d2;
+
+            
             List<History> data1 = new List<History>();
             List<History> data = new List<History>();
             string path = @"D:\Adil\ElesyTest\Data.xlsx";
@@ -81,6 +89,7 @@ namespace SmartCalculator.Controllers
                 
                 double val = (double)worksheet.Cells[1, 4].Value;
                 int value = (int)val;
+               
                 for(int i = 1; i <= value; i++)
                 {
                     History hh = new History();
@@ -89,29 +98,35 @@ namespace SmartCalculator.Controllers
                     hh.ip = worksheet.Cells[i, 3].Value.ToString();
                     data.Add(hh);
                 }
-                
+                int maxCounter = dCount2.Hour - dCount2.Hour;
+                int counter = 0;
+                DataCount[] dataCounts = new DataCount[maxCounter++];
+                for(int i =0; i <= maxCounter; i++)
+                {
+                    dataCounts[i].DateTime = dCount1.ToString();
+                    dataCounts[i].Count = 0;
+                }
                 foreach(var t in data)
                 {
-                    DateTime time = DateTime.ParseExact(t.dateTime, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture); //System.Globalization.CultureInfo.InvariantCulture
-                    if (time > d1 && time < d2) data1.Add(t);
+                    DateTime time = DateTime.ParseExact(t.dateTime, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture); 
+                    if (time > d1 && time < d2)
+                    { data1.Add(t);
+                        if ((dCount1.Hour + counter) < time.Hour && time.Hour < (dCount1.Hour+1) && counter <= maxCounter)
+                        {
+                            DataCount dt = new DataCount();
+                            if () { }
+                            else {
+                                dt.DateTime = dCount1.ToString();
+                                dt.Count = 1;
+                            }
+                                
+                            counter++;
+                        }
+                    }
                 }
             }
-            return View(data1);
-            /*<div>
-    <hr />
-    <dl class="dl-horizontal">
-        @foreach (var t in Model)
-        {
-            <dt>
-                @Html.DisplayName(t)
-            </dt>
-
-            <dd>
-                @Html.ActionLink("Информация", "Index2", new { id = t })
-            </dd>
-        }
-    </dl>
-</div> */
+            ViewBag.datas = data1;
+            return View(); 
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -147,8 +162,8 @@ namespace SmartCalculator.Controllers
             IPAddress[] addr = ipEntry.AddressList;
 
             return addr[addr.Length - 1].ToString();
-
         }
+
 
     }
 }
