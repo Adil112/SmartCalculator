@@ -42,11 +42,19 @@ namespace SmartCalculator.Controllers
         {
             Calculator calculator = new Calculator();
             Lists lists = new Lists();
+            if (d1 > d2)
+            {
+                ViewBag.Error = "Неправильно ввденный интервал времени!";
+                return View();
+            }
+                
             lists = calculator.GetLists(d1, d2);
             ViewBag.dataCounts = lists.list1; //dataCounts1;
             ViewBag.datas = lists.list2;  //data1;
-
-            calculator.GetDoc(lists);
+            ViewBag.Error = null;
+            ViewBag.d1 = d1;
+            ViewBag.d2 = d2;
+            calculator.GetDoc(lists, d1, d2);
             return View(); 
         }
 

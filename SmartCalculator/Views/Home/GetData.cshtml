@@ -6,12 +6,20 @@
 <form action="/Home/GetData" method="post" style="display: flex; align-items: center; justify-content: space-between; ">
 
     <div class="per">Период</div>
+    
     <input name="d1" type="datetime-local" style="width: 20%; height: 3.8%; left: 32.3%; top: 11.13%; border: 1px solid #000000; box-sizing: border-box;">
     <p><strong>&#8212&#8212</strong></p>
     <input name="d2" type="datetime-local" style="width: 20%; height: 3.8%; left: 59.1%; top: 11.13%; border: 1px solid #000000; box-sizing: border-box;">
     <button type="submit" class="pos"><div class="posm">Посмотреть</div></button>
 </form>
-
+<div class="text-center">
+    @if (ViewBag.Error != null)
+    {<div>@ViewBag.Error</div>}
+</div>
+<div class="text-center">
+    @if (ViewBag.d1 != null)
+    {<div>@ViewBag.d1 - @ViewBag.d2</div>}
+</div>
 <div style="        display: flex;
         align-items: start;
         justify-content: space-around;">
@@ -28,7 +36,7 @@
                     IP-адрес
                 </th>
             </tr>
-            @if (ViewBag.datas != null)
+            @if (ViewBag.datas != null && ViewBag.Error == null)
                 @foreach (History t in ViewBag.datas)
                 {
                     <tr>
@@ -55,7 +63,7 @@
                     Кол-во операций
                 </th>
             </tr>
-            @if (ViewBag.dataCounts != null)
+            @if (ViewBag.dataCounts != null && ViewBag.Error == null)
                 @foreach (DataCount t in ViewBag.dataCounts)
                 {
                     <tr>

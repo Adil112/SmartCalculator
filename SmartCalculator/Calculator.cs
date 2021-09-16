@@ -52,6 +52,7 @@ namespace SmartCalculator
         }
         public Lists GetLists(DateTime d1, DateTime d2)
         {
+            
             DateTime dCount1 = new DateTime(2021, 1, 1, 0, 0, 0);
             DateTime dCount2 = new DateTime(2021, 1, 1, 0, 0, 0);
             if (d1.Minute != 0 || d1.Second != 0) dCount1 = d1.AddMinutes(-d1.Minute).AddSeconds(-d1.Second);
@@ -149,7 +150,7 @@ namespace SmartCalculator
 
             return addr[addr.Length - 1].ToString();
         }
-        public void GetDoc(Lists lists) //сохранение в документе excel
+        public void GetDoc(Lists lists, DateTime d1, DateTime d2) //сохранение в документе excel
         {
             Random rnd = new Random();
             int z = rnd.Next(1, 100);
@@ -163,6 +164,8 @@ namespace SmartCalculator
             worksheet.Cells[1, 3].Value = "IP адрес";
             worksheet.Cells[1, 5].Value = "Дата и время";
             worksheet.Cells[1, 6].Value = "Кол-во операции";
+            worksheet.Cells[1, 8].Value = d1.ToString();
+            worksheet.Cells[1, 9].Value = d2.ToString();
             var list1 = lists.list2;
             var list2 = lists.list1;
             int list1Num = list1.Count;
