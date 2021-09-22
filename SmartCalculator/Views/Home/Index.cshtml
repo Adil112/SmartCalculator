@@ -12,12 +12,12 @@
         <p><input type="number" asp-for="num1" /></p>
 
         <p><label>Вторая цифра</label></p>
-        <p><input type="number" asp-for="num2" /></p>
-
-        <p><input type="submit" value="Сложение" asp-for="oper" /></p>
-        <p><input type="submit" value="Вычитание" asp-for="oper" /></p>
-        <p><input type="submit" value="Умножение" asp-for="oper" /></p>
-        <p><input type="submit" value="Деление" asp-for="oper" /></p>
+        <p><input type="number" asp-for="num2" /></p>          
+        
+        <p><input type="submit" value="@Operation.Сложение" asp-for="oper" /></p>
+        <p><input type="submit" value="@Operation.Вычитание" asp-for="oper" /></p>
+        <p><input type="submit" value="@Operation.Умножение" asp-for="oper" /></p>
+        <p><input type="submit" value="@Operation.Деление" asp-for="oper" /></p>
 
         <p><label>Результат</label></p>
         <p><label>@Model.showres</label></p>

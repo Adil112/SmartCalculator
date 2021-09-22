@@ -10,7 +10,8 @@ using System.Net;
 
 namespace SmartCalculator
 {
-    public class Calculator
+    
+    public class Calculator : ICalculator
     {
         public CalculatorInfo Calculate(CalculatorInfo calc)// сам калькулятор
         {
@@ -18,21 +19,21 @@ namespace SmartCalculator
             a = calc.num1;
             b = calc.num2;
             string sign = null;
-            switch (calc.oper) 
+            switch ((int)calc.oper) 
             {
-                case "Сложение":
+                case 0:
                     calc.result = a + b;
                     sign = "+";
                     break;
-                case "Вычитание":
+                case 1:
                     calc.result = a - b;
                     sign = "-";
                     break;
-                case "Умножение":
+                case 2:
                     calc.result = a * b;
                     sign = "*";
                     break;
-                case "Деление":
+                case 3:
                     calc.result = a / b;
                     sign = "/";
                     break;
@@ -59,7 +60,7 @@ namespace SmartCalculator
 
             return addr[addr.Length - 1].ToString();
         }
-        public void GetDoc(ListsOfReport lists, DateTime d1, DateTime d2) //сохранение отчета в документе excel (исправить!!!)
+        public void GetDoc(ListsOfReport lists, DateTime d1, DateTime d2) //сохранение отчета в документе excel
         {
             Random rnd = new Random();
             int z = rnd.Next(1, 100);
@@ -106,15 +107,21 @@ namespace SmartCalculator
 
         public void SaveHistory(History h)// записываем данные в csv
         {
+            object locker = new object();
             string path = @"Data.csv";
             var dateTime = h.dateTime;
             var operation = h.operation;
             var ip = h.ip;
-            File.AppendAllLines(path, new[] { $"{dateTime};{operation};{ip}" });
+            lock (locker)
+            {
+                File.AppendAllLines(path, new[] { $"{dateTime};{operation};{ip}" });
+            }
         }
 
         public ListsOfReport GetListsHistory(DateTime d1, DateTime d2) //получение записей истории в виде списков
         {
+            object locker = new object();
+            string line;
             DateTime dCount1 = new DateTime(2021, 1, 1, 0, 0, 0);
             DateTime dCount2 = new DateTime(2021, 1, 1, 0, 0, 0);
             if (d1.Minute != 0 || d1.Second != 0) dCount1 = d1.AddMinutes(-d1.Minute).AddSeconds(-d1.Second);
@@ -128,31 +135,23 @@ namespace SmartCalculator
             List<History> data = new List<History>();
             string path = @"Data.csv";
 
-
-            int value = 0;
-            string line;
-            TextReader reader = new StreamReader(path);
-            while ((line = reader.ReadLine()) != null) // определение количества строк
+            lock(locker)
             {
-                value++;
-            }
-            reader.Close();
-
-            using (StreamReader sr = new StreamReader(path)) //чтение записей из файла
-            {
-                string[] row = new string[3];
-                while ((line = sr.ReadLine()) != null)
+                using (StreamReader sr = new StreamReader(path)) //чтение записей из файла
                 {
-                    row = line.Split(';');
-                    History hh = new History();
-                    hh.dateTime = row[0];
-                    hh.operation = row[1];
-                    hh.ip = row[2];
-                    data.Add(hh);
+                    string[] row = new string[3];
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        row = line.Split(';');
+                        History hh = new History();
+                        hh.dateTime = row[0];
+                        hh.operation = row[1];
+                        hh.ip = row[2];
+                        data.Add(hh);
+                    }
                 }
             }
-         
-
+            
             for (int i = 0; i < maxCounter; i++) // создание почасового списка для каждого часа
             {
                 DataCount dt = new DataCount();

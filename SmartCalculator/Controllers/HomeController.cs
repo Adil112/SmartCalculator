@@ -14,11 +14,10 @@ namespace SmartCalculator.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        
-        public HomeController(ILogger<HomeController> logger)
+        ICalculator _calculator;
+        public HomeController(ICalculator calculator)
         {
-            _logger = logger;
+            _calculator = calculator;
         }
         [HttpGet]
         public IActionResult Index()
@@ -29,8 +28,7 @@ namespace SmartCalculator.Controllers
         [HttpPost]
         public IActionResult Index(CalculatorInfo calc)
         {
-            Calculator calculator = new Calculator();
-            calc.showres = calculator.Calculate(calc).showres;
+            calc.showres = _calculator.Calculate(calc).showres;
             return View(calc);
         }
         [HttpGet]
@@ -41,7 +39,6 @@ namespace SmartCalculator.Controllers
         [HttpPost]
         public IActionResult GetData(DateTime d1, DateTime d2)
         {
-            Calculator calculator = new Calculator();
             ListsOfReport lists = new ListsOfReport();
             if (d1 > d2)
             {
@@ -50,12 +47,12 @@ namespace SmartCalculator.Controllers
             }
             if (ModelState.IsValid)
             {
-                lists = calculator.GetListsHistory(d1, d2);
+                lists = _calculator.GetListsHistory(d1, d2);
                 ViewBag.dataCounts = lists.list1;
                 ViewBag.datas = lists.list2;  
                 ViewBag.d1 = d1;
                 ViewBag.d2 = d2;
-                calculator.GetDoc(lists, d1, d2);
+                _calculator.GetDoc(lists, d1, d2);
                 return View();
             }
             return View();
