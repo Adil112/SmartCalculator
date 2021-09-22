@@ -7,7 +7,7 @@ namespace SmartCalculator.Models
 {
     public class DataCount
     {
-        public string DateTime { get; set; }
-        public int Count { get; set; }
+        public string dateTime { get; set; }
+        public int count { get; set; }
     }
 }

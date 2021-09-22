@@ -48,13 +48,14 @@ namespace SmartCalculator.Controllers
                 return View();
             }
                 
-            lists = calculator.GetLists(d1, d2);
+            //lists = calculator.GetLists(d1, d2);
+            lists = calculator.GetListsHistory(d1, d2);
             ViewBag.dataCounts = lists.list1; //dataCounts1;
             ViewBag.datas = lists.list2;  //data1;
             ViewBag.Error = null;
             ViewBag.d1 = d1;
             ViewBag.d2 = d2;
-            calculator.GetDoc(lists, d1, d2);
+            //calculator.GetDoc(lists, d1, d2);
             return View(); 
         }
 

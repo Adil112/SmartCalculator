@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net;
+using CsvHelper;
 
 
 
@@ -47,7 +48,8 @@ namespace SmartCalculator
 
 
             h.ip = GetIP();
-            SetData(h);
+            //SetData(h);
+            SaveHistory(h);
             return calc;
         }
         public Lists GetLists(DateTime d1, DateTime d2)
@@ -86,8 +88,8 @@ namespace SmartCalculator
                 for (int i = 0; i < maxCounter; i++) // создание почасового списка для каждого часа
                 {
                     DataCount dt = new DataCount();
-                    dt.DateTime = dCount1.AddHours(i).ToString();
-                    dt.Count = 0;
+                    dt.dateTime = dCount1.AddHours(i).ToString();
+                    dt.count = 0;
                     dataCounts[i] = dt;
                 }
                 foreach (var t in data)
@@ -103,7 +105,7 @@ namespace SmartCalculator
                             DateTime dCount4 = dCount1.AddHours(j);
                             if ((dCount3 < time) && (time < dCount4))
                             {
-                                dataCounts[i].Count++; // почасовой список истории
+                                dataCounts[i].count++; // почасовой список истории
                             }
 
                         }
@@ -114,16 +116,16 @@ namespace SmartCalculator
             List<DataCount> dataCounts1 = new List<DataCount>();
             for (int i = 0; i < dataCounts.Length; i++) // убираем лишние записи
             {
-                if (dataCounts[i].Count != 0) dataCounts1.Add(dataCounts[i]);
+                if (dataCounts[i].count != 0) dataCounts1.Add(dataCounts[i]);
             }
             Lists lists = new Lists();
             lists.list1 = dataCounts1;
             lists.list2 = data1;
             return lists;
-        }
-        public void SetData(History h) // записываем данные в excel
+        } //получение записей истории в виде списков (старая)
+        public void SetData(History h) // записываем данные в excel (старая версия)
         {
-            string path = @"D:\Adil\ElesyTest\Data.xlsx";
+            string path = @"D:\Adil\ElesyTest\History.xls";
             FileInfo existingFile = new FileInfo(path);
             using (var package = new ExcelPackage(existingFile))
             {
@@ -150,7 +152,7 @@ namespace SmartCalculator
 
             return addr[addr.Length - 1].ToString();
         }
-        public void GetDoc(Lists lists, DateTime d1, DateTime d2) //сохранение в документе excel
+        public void GetDoc(Lists lists, DateTime d1, DateTime d2) //сохранение отчета в документе excel (исправить!!!)
         {
             Random rnd = new Random();
             int z = rnd.Next(1, 100);
@@ -184,19 +186,99 @@ namespace SmartCalculator
             {
                 if (list2Counter > (list2Num + 2)) break;
                 list2Counter++;
-                worksheet.Cells[list2Counter, 5].Value = t.DateTime;
-                worksheet.Cells[list2Counter, 6].Value = t.Count;
+                worksheet.Cells[list2Counter, 5].Value = t.dateTime;
+                worksheet.Cells[list2Counter, 6].Value = t.count;
             }
 
 
             worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
             pck.Save();
-            var proc = new Process();
-            proc.StartInfo = new ProcessStartInfo(name)
+        }
+
+        public void SaveHistory(History h)// записываем данные в csv (новая версия)
+        {
+            string path = @"D:\Adil\ElesyTest\Data.csv";
+            var dateTime = h.dateTime;
+            var operation = h.operation;
+            var ip = h.ip;
+            File.AppendAllLines(path, new[] { $"{dateTime};{operation};{ip}" });
+        }
+
+        public Lists GetListsHistory(DateTime d1, DateTime d2) //получение записей истории в виде списков (новая)
+        {
+            DateTime dCount1 = new DateTime(2021, 1, 1, 0, 0, 0);
+            DateTime dCount2 = new DateTime(2021, 1, 1, 0, 0, 0);
+            if (d1.Minute != 0 || d1.Second != 0) dCount1 = d1.AddMinutes(-d1.Minute).AddSeconds(-d1.Second);
+            else dCount1 = d1;
+            if (d2.Minute != 0 || d2.Second != 0) dCount2 = d2.AddMinutes(-d1.Minute).AddSeconds(-d1.Second);
+            else dCount2 = d2;
+            var max = (dCount2 - dCount1).TotalHours;
+            int maxCounter = (int)max;
+            DataCount[] dataCounts = new DataCount[++maxCounter];
+            List<History> data1 = new List<History>();
+            List<History> data = new List<History>();
+            string path = @"D:\Adil\ElesyTest\Data.csv";
+
+
+            int value = 0;
+            string line;
+            TextReader reader = new StreamReader(path);
+            while ((line = reader.ReadLine()) != null) // определение количества строк
             {
-                UseShellExecute = true
-            };
-            proc.Start();
+                value++;
+            }
+            reader.Close();
+
+            using (StreamReader sr = new StreamReader(path)) //чтение записей из файла
+            {
+                string[] row = new string[3];
+                while ((line = sr.ReadLine()) != null)
+                {
+                    row = line.Split(';');
+                    History hh = new History();
+                    hh.dateTime = row[0];
+                    hh.operation = row[1];
+                    hh.ip = row[2];
+                    data.Add(hh);
+                }
+            }
+         
+
+            for (int i = 0; i < maxCounter; i++) // создание почасового списка для каждого часа
+            {
+                DataCount dt = new DataCount();
+                dt.dateTime = dCount1.AddHours(i).ToString();
+                dt.count = 0;
+                dataCounts[i] = dt;
+            }
+            foreach (var t in data) // перебор записей
+            {
+                DateTime time = DateTime.ParseExact(t.dateTime, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                if (time > d1 && time < d2) // фильтрация по времени
+                {
+                    data1.Add(t); // обычный список истории
+                    for (int i = 0; i < maxCounter; i++)
+                    {
+                        int j = i + 1;
+                        DateTime dCount3 = dCount1.AddHours(i);
+                        DateTime dCount4 = dCount1.AddHours(j);
+                        if ((dCount3 < time) && (time < dCount4))
+                        {
+                            dataCounts[i].count++; // почасовой список истории
+                        }
+                    }
+                }
+            }
+
+            List<DataCount> dataCounts1 = new List<DataCount>();
+            for (int i = 0; i < dataCounts.Length; i++) // убираем лишние записи
+            {
+                if (dataCounts[i].count != 0) dataCounts1.Add(dataCounts[i]);
+            }
+            Lists lists = new Lists();
+            lists.list1 = dataCounts1;
+            lists.list2 = data1;
+            return lists;
         }
     }
 }
