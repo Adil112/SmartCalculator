@@ -1,4 +1,4 @@
-﻿@model SmartCalculator.Models.Calc
+﻿@model SmartCalculator.Models.CalculatorInfo
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -20,6 +20,6 @@
         <p><input type="submit" value="Деление" asp-for="oper" /></p>
 
         <p><label>Результат</label></p>
-        <p><input type="text" asp-for="@ViewData["showresult"]" /></p>
+        <p><label>@Model.showres</label></p>
     </div>
 </form>

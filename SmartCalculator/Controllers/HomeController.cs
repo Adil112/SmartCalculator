@@ -23,14 +23,15 @@ namespace SmartCalculator.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            return View();
+            CalculatorInfo calc = new CalculatorInfo();
+            return View(calc);
         }
         [HttpPost]
-        public IActionResult Index(Calc calc)
+        public IActionResult Index(CalculatorInfo calc)
         {
             Calculator calculator = new Calculator();
-            ViewData["showresult"] = calculator.Calculate(calc).showres;
-            return View();
+            calc.showres = calculator.Calculate(calc).showres;
+            return View(calc);
         }
         [HttpGet]
         public IActionResult GetData()
@@ -41,22 +42,23 @@ namespace SmartCalculator.Controllers
         public IActionResult GetData(DateTime d1, DateTime d2)
         {
             Calculator calculator = new Calculator();
-            Lists lists = new Lists();
+            ListsOfReport lists = new ListsOfReport();
             if (d1 > d2)
             {
-                ViewBag.Error = "Неправильно ввденный интервал времени!";
+                ModelState.AddModelError("", "Неккоректный интервал времени!");
                 return View();
             }
-                
-            //lists = calculator.GetLists(d1, d2);
-            lists = calculator.GetListsHistory(d1, d2);
-            ViewBag.dataCounts = lists.list1; //dataCounts1;
-            ViewBag.datas = lists.list2;  //data1;
-            ViewBag.Error = null;
-            ViewBag.d1 = d1;
-            ViewBag.d2 = d2;
-            //calculator.GetDoc(lists, d1, d2);
-            return View(); 
+            if (ModelState.IsValid)
+            {
+                lists = calculator.GetListsHistory(d1, d2);
+                ViewBag.dataCounts = lists.list1;
+                ViewBag.datas = lists.list2;  
+                ViewBag.d1 = d1;
+                ViewBag.d2 = d2;
+                calculator.GetDoc(lists, d1, d2);
+                return View();
+            }
+            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

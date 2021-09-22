@@ -6,16 +6,13 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net;
-using CsvHelper;
-
-
 
 
 namespace SmartCalculator
 {
     public class Calculator
     {
-        public Calc Calculate(Calc calc)// сам калькулятор
+        public CalculatorInfo Calculate(CalculatorInfo calc)// сам калькулятор
         {
             double a, b;
             a = calc.num1;
@@ -48,98 +45,8 @@ namespace SmartCalculator
 
 
             h.ip = GetIP();
-            //SetData(h);
             SaveHistory(h);
             return calc;
-        }
-        public Lists GetLists(DateTime d1, DateTime d2)
-        {
-            
-            DateTime dCount1 = new DateTime(2021, 1, 1, 0, 0, 0);
-            DateTime dCount2 = new DateTime(2021, 1, 1, 0, 0, 0);
-            if (d1.Minute != 0 || d1.Second != 0) dCount1 = d1.AddMinutes(-d1.Minute).AddSeconds(-d1.Second);
-            else dCount1 = d1;
-            if (d2.Minute != 0 || d2.Second != 0) dCount2 = d2.AddMinutes(-d1.Minute).AddSeconds(-d1.Second);
-            else dCount2 = d2;
-            var max = (dCount2 - dCount1).TotalHours;
-            int maxCounter = (int)max;
-            DataCount[] dataCounts = new DataCount[++maxCounter];
-            List<History> data1 = new List<History>();
-            List<History> data = new List<History>();
-            string path = @"D:\Adil\ElesyTest\Data.xlsx";
-            FileInfo existingFile = new FileInfo(path);
-            using (var package = new ExcelPackage(existingFile))
-            {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-
-                double val = (double)worksheet.Cells[1, 4].Value;
-                int value = (int)val;
-
-                for (int i = 1; i <= value; i++) // получение всех записей из документа
-                {
-                    History hh = new History();
-                    hh.dateTime = worksheet.Cells[i, 1].Value.ToString();
-                    hh.operation = worksheet.Cells[i, 2].Value.ToString();
-                    hh.ip = worksheet.Cells[i, 3].Value.ToString();
-                    data.Add(hh);
-                }
-
-                for (int i = 0; i < maxCounter; i++) // создание почасового списка для каждого часа
-                {
-                    DataCount dt = new DataCount();
-                    dt.dateTime = dCount1.AddHours(i).ToString();
-                    dt.count = 0;
-                    dataCounts[i] = dt;
-                }
-                foreach (var t in data)
-                {
-                    DateTime time = DateTime.ParseExact(t.dateTime, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-                    if (time > d1 && time < d2) // фильтрация по времени
-                    {
-                        data1.Add(t); // обычный список истории
-                        for (int i = 0; i < maxCounter; i++)
-                        {
-                            int j = i + 1;
-                            DateTime dCount3 = dCount1.AddHours(i);
-                            DateTime dCount4 = dCount1.AddHours(j);
-                            if ((dCount3 < time) && (time < dCount4))
-                            {
-                                dataCounts[i].count++; // почасовой список истории
-                            }
-
-                        }
-
-                    }
-                }
-            }
-            List<DataCount> dataCounts1 = new List<DataCount>();
-            for (int i = 0; i < dataCounts.Length; i++) // убираем лишние записи
-            {
-                if (dataCounts[i].count != 0) dataCounts1.Add(dataCounts[i]);
-            }
-            Lists lists = new Lists();
-            lists.list1 = dataCounts1;
-            lists.list2 = data1;
-            return lists;
-        } //получение записей истории в виде списков (старая)
-        public void SetData(History h) // записываем данные в excel (старая версия)
-        {
-            string path = @"D:\Adil\ElesyTest\History.xls";
-            FileInfo existingFile = new FileInfo(path);
-            using (var package = new ExcelPackage(existingFile))
-            {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-                var value = worksheet.Cells[1, 4].Value;
-                double count = (double)value + 1;
-                worksheet.Cells[(int)count, 1].Value = h.dateTime;
-                worksheet.Cells[(int)count, 2].Value = h.operation;
-                worksheet.Cells[(int)count, 3].Value = h.ip;
-                worksheet.Cells[1, 4].Value = count++;
-
-                package.Save();
-            }
         }
         public string GetIP() // получаем IP адрес
         {
@@ -152,13 +59,15 @@ namespace SmartCalculator
 
             return addr[addr.Length - 1].ToString();
         }
-        public void GetDoc(Lists lists, DateTime d1, DateTime d2) //сохранение отчета в документе excel (исправить!!!)
+        public void GetDoc(ListsOfReport lists, DateTime d1, DateTime d2) //сохранение отчета в документе excel (исправить!!!)
         {
             Random rnd = new Random();
             int z = rnd.Next(1, 100);
             string name = "Report" + z.ToString() + ".xlsx";
             FileInfo newFile = new FileInfo(name);
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelPackage pck = new ExcelPackage(newFile);
+            
             var worksheet = pck.Workbook.Worksheets.Add("History");
 
             worksheet.Cells[1, 1].Value = "Время и дата";
@@ -195,16 +104,16 @@ namespace SmartCalculator
             pck.Save();
         }
 
-        public void SaveHistory(History h)// записываем данные в csv (новая версия)
+        public void SaveHistory(History h)// записываем данные в csv
         {
-            string path = @"D:\Adil\ElesyTest\Data.csv";
+            string path = @"Data.csv";
             var dateTime = h.dateTime;
             var operation = h.operation;
             var ip = h.ip;
             File.AppendAllLines(path, new[] { $"{dateTime};{operation};{ip}" });
         }
 
-        public Lists GetListsHistory(DateTime d1, DateTime d2) //получение записей истории в виде списков (новая)
+        public ListsOfReport GetListsHistory(DateTime d1, DateTime d2) //получение записей истории в виде списков
         {
             DateTime dCount1 = new DateTime(2021, 1, 1, 0, 0, 0);
             DateTime dCount2 = new DateTime(2021, 1, 1, 0, 0, 0);
@@ -217,7 +126,7 @@ namespace SmartCalculator
             DataCount[] dataCounts = new DataCount[++maxCounter];
             List<History> data1 = new List<History>();
             List<History> data = new List<History>();
-            string path = @"D:\Adil\ElesyTest\Data.csv";
+            string path = @"Data.csv";
 
 
             int value = 0;
@@ -275,7 +184,7 @@ namespace SmartCalculator
             {
                 if (dataCounts[i].count != 0) dataCounts1.Add(dataCounts[i]);
             }
-            Lists lists = new Lists();
+            ListsOfReport lists = new ListsOfReport();
             lists.list1 = dataCounts1;
             lists.list2 = data1;
             return lists;

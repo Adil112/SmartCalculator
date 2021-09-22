@@ -13,8 +13,7 @@
     <button type="submit" class="pos"><div class="posm">Посмотреть</div></button>
 </form>
 <div class="text-center">
-    @if (ViewBag.Error != null)
-    {<div>@ViewBag.Error</div>}
+    @Html.ValidationSummary(true)
 </div>
 <div class="text-center">
     @if (ViewBag.d1 != null)
@@ -36,7 +35,7 @@
                     IP-адрес
                 </th>
             </tr>
-            @if (ViewBag.datas != null && ViewBag.Error == null)
+            @if (ViewBag.datas != null)
                 @foreach (History t in ViewBag.datas)
                 {
                     <tr>
@@ -63,7 +62,7 @@
                     Кол-во операций
                 </th>
             </tr>
-            @if (ViewBag.dataCounts != null && ViewBag.Error == null)
+            @if (ViewBag.dataCounts != null)
                 @foreach (DataCount t in ViewBag.dataCounts)
                 {
                     <tr>
